@@ -1,9 +1,6 @@
 package rolandgarros;
 
-import com.gonjansama.rolandgarros.Game;
-import com.gonjansama.rolandgarros.GamePoint;
-import com.gonjansama.rolandgarros.GameServiceImpl;
-import com.gonjansama.rolandgarros.Player;
+import com.gonjansama.rolandgarros.*;
 import org.junit.Assert;
 import org.junit.Test;
 
