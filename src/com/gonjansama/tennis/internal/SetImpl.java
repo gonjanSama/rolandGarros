@@ -160,15 +160,18 @@ public class SetImpl implements com.gonjansama.tennis.Set {
                (isOnTieBreak() && Math.max(getPlayerTieBreakScore(match.getPlayer1()), getPlayerTieBreakScore(match.getPlayer2())) < 7) ||
                (isOnTieBreak()
                    && Math.max(getPlayerTieBreakScore(match.getPlayer1()), getPlayerTieBreakScore(match.getPlayer2())) >= 7
-                   && Integer.valueOf(Math.abs(getPlayerTieBreakScore(match.getPlayer1()) - getPlayerTieBreakScore(getOpponent(match.getPlayer2())))).equals(1));
+                   && (Math.abs(getPlayerTieBreakScore(match.getPlayer1()) - getPlayerTieBreakScore(match.getPlayer2()))) < 2);
     }
 
     private Boolean winBy(Player player) {
         return (getPlayerScore(player).equals(7) && (getOpponentScore(player) >= 5 && getOpponentScore(player) < 7)) ||
                 (getPlayerScore(player).equals(6) && (getOpponentScore(player) <= 4)) ||
                 (isOnTieBreak()
-                    && Integer.valueOf(getPlayerTieBreakScore(player) - getPlayerTieBreakScore(getOpponent(player))).equals(2)
-                    && getPlayerTieBreakScore(player) >= 7);
+                    && Integer.valueOf(getPlayerTieBreakScore(player) - getOpponentTieBreakScore(player)).equals(2)
+                    && getPlayerTieBreakScore(player) > 7) ||
+                (isOnTieBreak()
+                        && (getPlayerTieBreakScore(player) - getOpponentTieBreakScore(player)) >= 2
+                        && getPlayerTieBreakScore(player) == 7);
     }
 
     @Override
