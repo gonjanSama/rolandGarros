@@ -3,8 +3,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.gonjansama</groupId>
-    <artifactId>roland-garros</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <artifactId>tennis</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <dependencies>
