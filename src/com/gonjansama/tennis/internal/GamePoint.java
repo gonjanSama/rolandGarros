@@ -1,6 +1,6 @@
 package com.gonjansama.tennis.internal;
 
-public enum GamePoint {
+enum GamePoint {
     ZERO("0", 0), FIFTEEN("15", 15), THIRTHY("30", 30), FOURTHY("40", 40),
     ADVANTAGE("adv", 50), WIN_POINT("win_point", 99);
 

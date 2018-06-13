@@ -34,7 +34,7 @@ class ScoringAlgorithm {
         List<Integer> allowDiffsOnTieBreak = Stream.of(1, 2).collect(Collectors.toList());
         return player1Score >= 0 && player2Score >= 0 &&
                 (Math.max(player1Score, player2Score) < 7 || (Math.max(player1Score, player2Score) >= 7
-                        && allowDiffsOnTieBreak.contains(Integer.valueOf(Math.abs(player1Score - player2Score)))));
+                        && allowDiffsOnTieBreak.contains(Math.abs(player1Score - player2Score))));
     }
 
     static Map<Player, GamePoint> calculateNextGameScore(Player scorer, GameImpl game) {

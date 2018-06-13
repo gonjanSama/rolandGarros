@@ -3,11 +3,14 @@ package com.gonjansama.tennis.internal;
 
 import com.gonjansama.tennis.Match;
 import com.gonjansama.tennis.Player;
+import com.gonjansama.tennis.Set;
+
+import java.util.Optional;
 
 public class MatchImpl implements Match {
     private final Player player1;
     private final Player player2;
-    private final SetImpl set;
+    private final Set set;
 
     public MatchImpl(Player player1, Player player2) {
         this.player1 = player1;
@@ -25,11 +28,11 @@ public class MatchImpl implements Match {
     }
 
     @Override
-    public Player getWinner() {
+    public Optional<Player> getWinner() {
         return set.getWinner();
     }
 
-    public SetImpl getCurrentSet() {
+    public Set getCurrentSet() {
         return set;
     }
 
