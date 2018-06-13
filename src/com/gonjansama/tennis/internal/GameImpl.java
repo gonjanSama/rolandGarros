@@ -2,17 +2,19 @@ package com.gonjansama.tennis.internal;
 
 import com.gonjansama.tennis.Game;
 import com.gonjansama.tennis.Player;
+import com.gonjansama.tennis.Set;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class GameImpl implements Game {
-    private final SetImpl set;
+    private final Set set;
     private final Map<Player, GamePoint> score = new HashMap<>();
 
-    public GameImpl(SetImpl set) {
+    public GameImpl(Set set) {
         score.put(set.getPlayer1(), GamePoint.ZERO);
         score.put(set.getPlayer2(), GamePoint.ZERO);
         this.set = set;
@@ -67,9 +69,9 @@ public class GameImpl implements Game {
     }
 
     @Override
-    public Player getWinner() {
-        if (isInProgress()) throw new IllegalStateException("Can not get winner when Game is in progress");
-        return winBy(set.getPlayer1()) ? set.getPlayer1() : set.getPlayer2();
+    public Optional<Player> getWinner() {
+        return winBy(set.getPlayer1()) ? Optional.of(set.getPlayer1()) :
+                winBy(set.getPlayer2()) ? Optional.of(set.getPlayer2()) : Optional.empty();
     }
 
     @Override

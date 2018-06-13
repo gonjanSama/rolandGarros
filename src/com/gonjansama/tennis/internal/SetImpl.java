@@ -1,23 +1,27 @@
 package com.gonjansama.tennis.internal;
 
+import com.gonjansama.tennis.Game;
+import com.gonjansama.tennis.Match;
 import com.gonjansama.tennis.Player;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
+
 public class SetImpl implements com.gonjansama.tennis.Set {
-    private final java.util.List<GameImpl> games = new ArrayList<>();
-    private final MatchImpl match;
+    private final java.util.List<Game> games = new ArrayList<>();
+    private final Match match;
     private final Map<Player, Integer> score = new HashMap<>();
-    private GameImpl currentGame;
+    private Game currentGame;
     private Map<Player, Integer> tieBreakScore;
     private Boolean tieBreakScoreInitialized = false;
-     
 
-    public SetImpl(MatchImpl match) {
+
+    public SetImpl(Match match) {
         this.match = match;
         score.put(match.getPlayer1(), 0);
         score.put(match.getPlayer2(), 0);
@@ -48,7 +52,7 @@ public class SetImpl implements com.gonjansama.tennis.Set {
         score.put(getPlayer(player.getName()), playerScore);
         if (isOnTieBreak()) {
             if (!tieBreakScoreInitialized) {
-              initializedTieBreakScore();
+                initializedTieBreakScore();
             }
         }
     }
@@ -61,7 +65,8 @@ public class SetImpl implements com.gonjansama.tennis.Set {
     }
 
     public void setPlayerTieBreakScore(Player player, Integer playerScore) {
-        if (!isOnTieBreak()) throw new IllegalStateException("Can not set tiebreak score for a player when the set is not on tiebreak");
+        if (!isOnTieBreak())
+            throw new IllegalStateException("Can not set tiebreak score for a player when the set is not on tiebreak");
         Integer opponentScore = getOpponentTieBreakScore(player);
         if (!ScoringAlgorithm.isValidTieBreakScore(opponentScore, playerScore)) {
             throw new IllegalArgumentException("Can not set player tiebreak score with : " + playerScore + " when his opponent have : " + opponentScore);
@@ -71,12 +76,13 @@ public class SetImpl implements com.gonjansama.tennis.Set {
 
     @Override
     public Integer getPlayerTieBreakScore(Player player) {
-        if (!isOnTieBreak()) throw new IllegalStateException("Can not get tiebreak score for a player when the set is not on tiebreak");
+        if (!isOnTieBreak())
+            throw new IllegalStateException("Can not get tiebreak score for a player when the set is not on tiebreak");
         return tieBreakScore.get(getPlayer(player.getName()));
     }
 
     @Override
-    public GameImpl createGame() {
+    public Game createGame() {
         if (currentGame != null) {
             throw new IllegalStateException("A Game is already launched for this set");
         }
@@ -89,14 +95,14 @@ public class SetImpl implements com.gonjansama.tennis.Set {
     }
 
     @Override
-    public GameImpl getCurrentGame() {
+    public Game getCurrentGame() {
         if (!isInProgress()) {
             throw new IllegalStateException("Can not get current game for a finished set");
         }
         return currentGame;
     }
 
-    public void setCurrentGame(GameImpl game) {
+    public void setCurrentGame(Game game) {
         if (currentGame != null) throw new IllegalStateException("A Game is already launched for this set");
         currentGame = game;
         games.add(game);
@@ -130,13 +136,12 @@ public class SetImpl implements com.gonjansama.tennis.Set {
         return match.getPlayer(name);
     }
 
-    public Set<GameImpl> getGames() {
+    public Set<Game> getGames() {
         return new HashSet<>(games);
     }
 
-    void updateScore() {
-        if (currentGame.hasWinner()) {
-            Player gameWinner = currentGame.getWinner();
+    public void updateScore() {
+        currentGame.getWinner().ifPresent(gameWinner -> {
             Map<String, Integer> updatedScores = ScoringAlgorithm.calculatePlayerSetScore(gameWinner, this);
             if (!isOnTieBreak()) {
                 setPlayerScore(gameWinner, updatedScores.get("setScore"));
@@ -144,7 +149,7 @@ public class SetImpl implements com.gonjansama.tennis.Set {
                 setPlayerTieBreakScore(gameWinner, updatedScores.get("tiebreakScore"));
             }
             currentGame = null;
-        }
+        });
     }
 
     public Boolean hasWinner() {
@@ -157,27 +162,27 @@ public class SetImpl implements com.gonjansama.tennis.Set {
 
     public Boolean isInProgress() {
         return (!hasWinner() && getPlayer1Score() <= 6 && getPlayer2Score() <= 6) ||
-               (isOnTieBreak() && Math.max(getPlayerTieBreakScore(match.getPlayer1()), getPlayerTieBreakScore(match.getPlayer2())) < 7) ||
-               (isOnTieBreak()
-                   && Math.max(getPlayerTieBreakScore(match.getPlayer1()), getPlayerTieBreakScore(match.getPlayer2())) >= 7
-                   && (Math.abs(getPlayerTieBreakScore(match.getPlayer1()) - getPlayerTieBreakScore(match.getPlayer2()))) < 2);
+                (isOnTieBreak() && Math.max(getPlayerTieBreakScore(match.getPlayer1()), getPlayerTieBreakScore(match.getPlayer2())) < 7) ||
+                (isOnTieBreak()
+                        && Math.max(getPlayerTieBreakScore(match.getPlayer1()), getPlayerTieBreakScore(match.getPlayer2())) >= 7
+                        && (Math.abs(getPlayerTieBreakScore(match.getPlayer1()) - getPlayerTieBreakScore(match.getPlayer2()))) < 2);
     }
 
     private Boolean winBy(Player player) {
         return (getPlayerScore(player).equals(7) && (getOpponentScore(player) >= 5 && getOpponentScore(player) < 7)) ||
                 (getPlayerScore(player).equals(6) && (getOpponentScore(player) <= 4)) ||
                 (isOnTieBreak()
-                    && Integer.valueOf(getPlayerTieBreakScore(player) - getOpponentTieBreakScore(player)).equals(2)
-                    && getPlayerTieBreakScore(player) > 7) ||
+                        && Integer.valueOf(getPlayerTieBreakScore(player) - getOpponentTieBreakScore(player)).equals(2)
+                        && getPlayerTieBreakScore(player) > 7) ||
                 (isOnTieBreak()
                         && (getPlayerTieBreakScore(player) - getOpponentTieBreakScore(player)) >= 2
                         && getPlayerTieBreakScore(player) == 7);
     }
 
     @Override
-    public Player getWinner() {
-        if (isInProgress()) throw new IllegalStateException("Can not get winner for a set in progress");
-        return winBy(match.getPlayer1()) ? match.getPlayer1() : winBy(match.getPlayer2()) ? match.getPlayer2() : null;
+    public Optional<Player> getWinner() {
+        return winBy(match.getPlayer1()) ? Optional.of(match.getPlayer1()) :
+                winBy(match.getPlayer2()) ? Optional.of(match.getPlayer2()) : Optional.empty();
     }
 
     @Override

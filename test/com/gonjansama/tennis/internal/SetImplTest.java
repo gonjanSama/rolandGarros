@@ -1,13 +1,15 @@
 package com.gonjansama.tennis.internal;
 
+import com.gonjansama.tennis.Game;
 import com.gonjansama.tennis.Player;
+import com.gonjansama.tennis.Set;
 import org.junit.Assert;
 import org.junit.Test;
 
 public class SetImplTest {
     private Player nadal = new Player("nadal", 1);
     private Player federer = new Player("federer", 2);
-    private SetImpl set;
+    private Set set;
 
     @Test
     public void should_start_set_with_score_0_for_each_player() {
@@ -27,8 +29,8 @@ public class SetImplTest {
     public void  should_return_1_point_for_a_player_with_0_point_when_this_player_win_a_game() {
         // Given
         set =  new MatchImpl(nadal, federer).getCurrentSet();
-        GameImpl game =  set.getCurrentGame();
-        game.getScore().put(nadal, GamePoint.FOURTHY);
+        Game game =  set.getCurrentGame();
+        ((GameImpl)game).getScore().put(nadal, GamePoint.FOURTHY);
 
         // When
         game.addPoint(nadal);
@@ -43,15 +45,16 @@ public class SetImplTest {
         set =  new MatchImpl(nadal, federer).getCurrentSet();
         set.setPlayerScore(federer, 5);
         set.setPlayerScore(nadal, 4);
-        GameImpl game =  set.getCurrentGame();
-        game.getScore().put(federer, GamePoint.FOURTHY);
+        Game game =  set.getCurrentGame();
+        ((GameImpl)game).getScore().put(federer, GamePoint.FOURTHY);
 
         // When
         game.addPoint(federer);
 
         // Then
         Assert.assertEquals(Integer.valueOf(6), set.getPlayerScore(federer));
-        Assert.assertEquals(federer, set.getWinner());
+        Assert.assertTrue(set.getWinner().isPresent());
+        Assert.assertEquals(federer, set.getWinner().get());
         Assert.assertEquals(false, set.isInProgress());
     }
 
@@ -61,8 +64,8 @@ public class SetImplTest {
         set =  new MatchImpl(nadal, federer).getCurrentSet();
         set.setPlayerScore(federer, 5);
         set.setPlayerScore(nadal, 5);
-        GameImpl game =  set.getCurrentGame();
-        game.getScore().put(federer, GamePoint.FOURTHY);
+        Game game =  set.getCurrentGame();
+        ((GameImpl)game).getScore().put(federer, GamePoint.FOURTHY);
 
         // When
         game.addPoint(federer);
@@ -79,15 +82,16 @@ public class SetImplTest {
         set =  new MatchImpl(nadal, federer).getCurrentSet();
         set.setPlayerScore(federer, 6);
         set.setPlayerScore(nadal, 5);
-        GameImpl game =  set.getCurrentGame();
-        game.getScore().put(federer, GamePoint.FOURTHY);
+        Game game =  set.getCurrentGame();
+        ((GameImpl)game).getScore().put(federer, GamePoint.FOURTHY);
 
         // When
         game.addPoint(federer);
 
         // Then
         Assert.assertEquals(Integer.valueOf(7), set.getPlayerScore(federer));
-        Assert.assertEquals(federer, set.getWinner());
+        Assert.assertTrue(set.getWinner().isPresent());
+        Assert.assertEquals(federer, set.getWinner().get());
         Assert.assertEquals(false, set.isInProgress());
     }
 
@@ -97,8 +101,8 @@ public class SetImplTest {
         set =  new MatchImpl(nadal, federer).getCurrentSet();
         set.setPlayerScore(federer, 5);
         set.setPlayerScore(nadal, 6);
-        GameImpl game =  set.getCurrentGame();
-        game.getScore().put(federer, GamePoint.FOURTHY);
+        Game game =  set.getCurrentGame();
+        ((GameImpl)game).getScore().put(federer, GamePoint.FOURTHY);
 
         // When
         game.addPoint(federer);
@@ -113,8 +117,8 @@ public class SetImplTest {
         set =  new MatchImpl(nadal, federer).getCurrentSet();
         set.setPlayerScore(federer, 6);
         set.setPlayerScore(nadal, 6);
-        GameImpl game =  set.getCurrentGame();
-        game.getScore().put(federer, GamePoint.FOURTHY);
+        Game game =  set.getCurrentGame();
+        ((GameImpl)game).getScore().put(federer, GamePoint.FOURTHY);
 
         // When
         game.addPoint(federer);
@@ -134,13 +138,14 @@ public class SetImplTest {
         set.setPlayerTieBreakScore(nadal, 5);
 
         // When
-        GameImpl game =  set.getCurrentGame();
-        game.getScore().put(federer, GamePoint.FOURTHY);
+        Game game =  set.getCurrentGame();
+        ((GameImpl)game).getScore().put(federer, GamePoint.FOURTHY);
         game.addPoint(federer);
 
         //Then
         Assert.assertEquals(true, set.isOnTieBreak());
         Assert.assertEquals(Integer.valueOf(7), set.getPlayerTieBreakScore(federer));
-        Assert.assertEquals(federer, set.getWinner());
+        Assert.assertTrue(set.getWinner().isPresent());
+        Assert.assertEquals(federer, set.getWinner().get());
     }
 }
